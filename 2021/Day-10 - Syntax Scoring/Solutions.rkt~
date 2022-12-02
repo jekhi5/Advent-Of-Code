@@ -1,0 +1,72 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname Solutions) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(define CLOSING-VALUES '(")" "}" "]" ">"))
+
+; is-corrupted? : String -> Boolean
+; Is the given string corrupted?
+
+(check-expect (is-corrupted? "((()))") #false)
+(check-expect (is-corrupted? "{{}{}}{}") #false)
+(check-expect (is-corrupted? "<>") #false)
+(check-expect (is-corrupted? "[[[][]][]]") #false)
+(check-expect (is-corrupted? "(") #false)
+(check-expect (is-corrupted? "[[[[[[[[]]]") #false)
+
+(check-expect (is-corrupted? "({)}") #true)
+(check-expect (is-corrupted? "[][][]{}{{}<><>)()()") #true)
+
+
+(define (is-corrupted? strng)
+  (local [(define val-length (string-length strng))]
+    (if (= val-length 1) #false
+        (local [(define cur-val (substring strng 0 1))
+
+                ; get-match : String -> String
+                ; Returns the associated closing bracket match or #false if is closing value
+                (define (get-match val)
+                  (cond [(member? val CLOSING-VALUES) #false]
+                        [(string=? val "(") ")"]
+                        [(string=? val "{") "}"]
+                        [(string=? val "[") "]"]
+                        [(string=? val "<") ">"]))
+                
+                (define searching-val (get-match cur-val))
+
+                ; has-matching-close : String String Number -> Boolean
+                ; Does the given string have a matching closer?
+                ; NOTE: This will return true if the end of the string is reaching.  This is because
+                ;       the string is "incomplete" not "corrupted".  This function only eliminates
+                ;       corrupted strings
+                (define (has-matching-close strng/helper searching-value number-of-enclosed)
+                  (if (= (string-length strng/helper strng))
+                      (has-matching-close (substring strng/helper 1) searching-value)
+                      (cond [(zero? (string-length strng/helper)) #true]
+                            [(positive? (string-length strng/helper))
+                             (local [(define first-val (substring strng/helper 0 1))]
+                               (cond [(not (member? first-val CLOSING-VALUES))
+                                      (and (has-matching-close (strng/helper 1)
+                                                               (get-match first-val)
+                                                               0)
+                                           (has-matching-close (strng/helper 1)
+                                                               searching-value
+                                                               (add1 number-of-enclosed)))]
+                                     [(member? first-val CLOSING-VALUES)
+                                      (if (zero? number-of-enclosed)
+                                          (string=? searching-value (substring strng/helper 0 1))
+                                          (has-matching-close strng/helper
+                                                              searching-value
+                                                              (sub1 number-of-enclosed)))]))])))
+                                              
+
+                (define is-corrupted (not (has-matching-close strng searching-val 0)))]
+          (if is-corrupted
+              #true
+              (is-corrupted? (substring strng 1)))))))
+              
+
+; remove-corrupted : [List-of String] -> [List-of String]
+; Returns a list containing only the valid strings
+
+(define (remove-corrupted los)
+  (filter (not (is-corrupted?)) los))
