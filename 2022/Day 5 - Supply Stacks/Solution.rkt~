@@ -1,7 +1,0 @@
-#lang racket
-
-(define in
-  (open-input-file "input.txt"))
-
-(define string-input (read-string 20000 in))
-(define loi (string-split string-input "\n"))
