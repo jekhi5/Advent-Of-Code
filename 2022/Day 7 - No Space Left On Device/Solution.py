@@ -34,38 +34,69 @@ def dive_deep(dirs, key):
     dirs[key][1] = []
     return dirs
 
+#def Solution(inpt):
+#   
+#   directories = {}
+#
+#   result = 0
+#   history = []
+#   parent = ""
+#   for d in dirs:
+#       if d.find("..") > -1:
+#           former = history.pop()
+#           parent = parent[0:len(parent) - len(former)]
+#           continue
+#       
+#       history.append(d[0:d.find("\n")])
+#       parent += history[len(history) - 1]
+#
+#       name = parent
+#       result_pair = get_dir_size(d, parent)
+#       directories[name] = result_pair
+#
+#   keys = list(directories.keys())
+#   for key in keys:
+#       directories = dive_deep(directories, key)
+#       
+#   for entry in directories:
+#       if directories[entry][0] <= 100000:
+#           result += directories[entry][0]
+#
+#
+#   #print(directories)   
+#   return [result, directories]
+
+class FileSystem:
+    def __init__(self, parent, name, subd, files, size):
+        self.parent = parent
+        self.name = name
+        self.subd = subd
+        self.files = files
+        self.size = size
+
 def Solution(inpt):
+
+    filesystem = Filesystem(None, "/", [], [], 0)
     
-    directories = {}
-
-    result = 0
     history = []
-    parent = ""
-    for d in dirs:
-        if d.find("..") > -1:
-            former = history.pop()
-            parent = parent[0:len(parent) - len(former)]
-            continue
+    parent = None
+    for dir_ in inpt:
+        lines = dir_.split("\n")
+        dir_name = inpt[0:]
+        new_entry = FileSystem(parent, dir_name, [], [], 0)
         
-        history.append(d[0:d.find("\n")])
-        parent += history[len(history) - 1]
-
-        name = parent
-        result_pair = get_dir_size(d, parent)
-        directories[name] = result_pair
-    keys = list(directories.keys())
-    for key in keys:
-        directories = dive_deep(directories, key)
-        
-    for entry in directories:
-        if directories[entry][0] <= 100000:
-            result += directories[entry][0]
+        for line in lines:
+            if line.starts_with("$"):
+                continue
+            elif line.starts_with("dir "):
+                
 
 
-    #print(directories)   
-    return [result, directories]
 
 print(Solution(dirs)[0])
+
+
+
 
 def Solution2(inpt):
     prior_result = Solution(inpt)
