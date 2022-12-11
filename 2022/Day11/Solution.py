@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from math import gcd
 
 file = open("input.txt")
 loi = file.read()
@@ -31,27 +30,11 @@ def make_fund(str_inpt):
     if split[0] == "/":
         return lambda x: x / int(split[1])
 
-def highest_factor(nums):
-    if len(nums) == 1:
-        return nums[0]
-
-    div = gcd(nums[0], nums[1])
-
-    if len(nums) == 2:
-        return div
-
-    for i in range(1, len(nums) - 1):
-        div = gcd(div, nums[i + 1])
-        if div == 1:
-            return div
-
-    return div
-
 
 def Solution(inpt, rounds, able_to_relax):
 
     situation = {}
-    tests = []
+    total_test_num = 1
     for monkey in inpt:
         lines = monkey.split("\n")
 
@@ -63,25 +46,29 @@ def Solution(inpt, rounds, able_to_relax):
         operation = make_fund(lines[2][lines[2].find("=") + 6:])
 
         test_num = int(lines[3].split(" ")[-1])
-        tests.append(test_num)
+        total_test_num *= test_num
         true_monkey = lines[4].split(" ")[-1]
         false_monkey = lines[5].split(" ")[-1]
 
         situation[name] = Monkey(items, operation, test_num, true_monkey, false_monkey, 0)
 
 
-    GCF = highest_factor(tests)
-    print("GCF: ", GCF)
     for i in range(rounds):
         for monkey in situation.values():
             for item in monkey.items:
                 post_inspection = monkey.op(item)
-                post_relax = post_inspection // 3 if able_to_relax else post_inspection // GCF
-                if post_relax % monkey.test_num == 0:
-                    situation[monkey.true_monkey].items.append(post_relax)
-                else:
-                    situation[monkey.false_monkey].items.append(post_relax)
 
+                if able_to_relax:
+                    post_relax = post_inspection // 3
+                    if post_relax % monkey.test_num == 0:
+                        situation[monkey.true_monkey].items.append(post_relax)
+                    else:
+                        situation[monkey.false_monkey].items.append(post_relax)
+                else:
+                    if post_inspection % monkey.test_num == 0:
+                        situation[monkey.true_monkey].items.append(post_inspection % total_test_num)
+                    else:
+                        situation[monkey.false_monkey].items.append(post_inspection % total_test_num)
 
             monkey.items_handled += len(monkey.items)
             monkey.items = []
