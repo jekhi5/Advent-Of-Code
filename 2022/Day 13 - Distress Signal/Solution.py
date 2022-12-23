@@ -58,8 +58,6 @@ file.close()
 
 
 def is_in_order(left, right):
-#    print("LEFT: ", left)
-#    print("RIGHT: ", right)
     if isinstance(left, int) and isinstance(right, int):
         if left > right:
             return 1
@@ -93,7 +91,6 @@ for i in range(len(result)):
     pair = result[i]
 
     if is_in_order(pair[0], pair[1]) == -1:
- #       print("IN ORDER: ", i + 1)
         total += i + 1
 
 
