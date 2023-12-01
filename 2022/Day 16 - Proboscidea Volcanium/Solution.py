@@ -1,104 +1,43 @@
 #!/usr/bin/env python3
 import math, sys, copy
-from functools import cmp_to_key
 
-file = open("input.txt")
-loi = file.readlines()
+loi = None
+with open("input.txt") as file:
+    loi = file.readlines()
 
-def build_list(inpt):
-    cur_list = []
-    skip_amt = 0
-    for i in range(1, len(inpt)):
-        if skip_amt > 0:
-            skip_amt -= 1
-            continue
-        elif str.isdigit(inpt[i]):
-            next_comma = sys.maxsize if inpt.find(",", i) == -1 else inpt.find(",", i)
-            next_closing_brace = inpt.find("]", i)
-            next_token = min(next_comma, next_closing_brace)
+# Graph syntax:
 
-            full_num = inpt[i:next_token]
-            cur_list.append(int(full_num))
-            skip_amt = len(full_num) - 1
-        elif inpt[i] == "[":
-            inner_list = build_list(inpt[i:])
-            cur_list.append(inner_list)
+# {"String node name" : {"total_pressure_release": [list of n pressures where each index, i, stores (weight * (n - i)) indicating the total pressure released if the valvue was released at minute i],
+#                        "edges": [List of edge names],
+#                        "valve_open": True/False
+#                        "max_value": The most pressure that can be released upon reaching this node. Will be updated as the algorithm processes}
+#  ....}
 
-            count = 1
-            for j in range(i + 1, len(inpt)):
-                if inpt[j] == "[":
-                    count += 1
-                elif inpt[j] == "]":
-                    count -= 1
+graph = {}
 
-                if count == 0:
-                    skip_amt = j - i
-                    break
-
-            if count != 0:
-                raise Exception(f'Error! Mistep creating list! inner_list: {inner_list}. cur_list: {cur_list}')
-            
-        elif inpt[i] == "]":
-            return [x for x in cur_list]
-
-    raise Exception(f'Error didn\'t reach base case. cur_list: {cur_list}')
-
-result = []
-cur_pair = []
+MINUTES = 30
 
 for line in loi:
-    if line.startswith("["):
-        cur_pair.append(build_list(line))
-    else:
-        result.append((cur_pair[0], cur_pair[1]))
-        cur_pair = []
+    name = line[6:8]
 
-result.append((cur_pair[0], cur_pair[1]))
-file.close()
+    init_rate = int(line[line.find("=") + 1:line.find(";")])
+    
+    # Fill the rates array by decreasing the amount of total pressure that would be released based on what minute it was released at
+    rates = [init_rate * (MINUTES - x) for x in range(MINUTES)]
 
+    neighbors = line.split(",")
+    neighbors[0] = neighbors[0][len(neighbors[0]) - 2:]
 
-def is_in_order(left, right):
-    if isinstance(left, int) and isinstance(right, int):
-        if left > right:
-            return 1
-        if left == right:
-            return 0
-        if left < right:
-            return -1
-    elif isinstance(left, int) and isinstance(right, list):
-        return is_in_order([left], right)
-    elif isinstance(left, list) and isinstance(right, int):
-        return is_in_order(left, [right])
-    elif isinstance(left, list) and isinstance(right, list):
-        for i in range(min(len(left), len(right))):
-            status = is_in_order(left[i], right[i])
-                
-            if status == 1 or status == -1:
-                return status
-                
-        if len(left) < len(right):
-            return -1
-        if len(left) == len(right):
-            return 0
-        if len(left) > len(right):
-            return 1
-    else:
-        raise Exception("BAD TYPE")
+    neighbors = list(map(lambda x: x.strip(), neighbors))
 
-total = 0
-
-for i in range(len(result)):
-    pair = result[i]
-
-    if is_in_order(pair[0], pair[1]) == -1:
-        total += i + 1
+    graph[name] = {"total_pressure_release": rates,
+                   "edges": neighbors,
+                   "valve_open": False
+                   "max_value": -1}
 
 
-sorted_packets = [x for t in result for x in t]
-sorted_packets.append([[2]])
-sorted_packets.append([[6]])
-sorted_packets = list(sorted(sorted_packets, key=cmp_to_key(is_in_order)))
+for key, val in graph.items():
+    print(key, " : ", val)
 
 
-print(total)
-print((sorted_packets.index([[2]]) + 1) * (sorted_packets.index([[6]]) + 1))
+
