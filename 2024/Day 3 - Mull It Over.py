@@ -17,7 +17,7 @@ def solution(line, part):
 
 
 # # Result
-with open("2024/Day 3 - Mull It Over/index.txt", 'r') as f:
+with open("2024/inputs/3.txt", 'r') as f:
     puzzleInput = f.read()
 
     print("Solution for part 1: ", solution(puzzleInput, 1))

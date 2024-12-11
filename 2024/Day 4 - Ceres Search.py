@@ -61,7 +61,7 @@ def solution(puzzle, part):
 
 
 # # Result
-with open("2024/Day 4 - Ceres Search/input.txt", 'r') as f:
+with open("2024/inputs/4.txt", 'r') as f:
     puzzleInput = f.read()
 
     print("Solution for part 1: ", solution(puzzleInput, 1))

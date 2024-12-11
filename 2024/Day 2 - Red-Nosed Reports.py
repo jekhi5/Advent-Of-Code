@@ -41,7 +41,7 @@ def solution(lines, part):
 
 
 # # Result
-file = open("2024/Day 2 - Red-Nosed Reports/index.txt")
+file = open("2024/inputs/2.txt")
 linesOfPuzzleInput = file.readlines()
 file.close()
 

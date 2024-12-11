@@ -31,7 +31,7 @@ def solution(lines, part):
 
 
 # # Result
-file = open("2024/Day 1- Historian Hysteria/input.txt")
+file = open("2024/inputs/1.txt")
 linesOfPuzzleInput = file.readlines()
 file.close()
 
