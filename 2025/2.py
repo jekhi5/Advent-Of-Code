@@ -58,8 +58,8 @@ def solution(ranges, part=1):
 
 
 file = open("2025/inputs/2.txt")
-linesOfPuzzleInput = file.read().split(",")
+lines = file.read().split(",")
 file.close()
 
-print("Solution for part 1: ", solution(linesOfPuzzleInput, 1))
-print("Solution for part 2: ", solution(linesOfPuzzleInput, 2))
+print("Solution for part 1: ", solution(lines, 1))
+print("Solution for part 2: ", solution(lines, 2))
