@@ -1,26 +1,27 @@
-def num_rolls_surrounding(grid, row, col):
+def num_rolls_surrounding(grid: list[int], row: int, col: int) -> int:
     lower_row_bound = max(0, row - 1)
     upper_row_bound = min(len(grid) - 1, row + 1)
     lower_col_bound = max(0, col - 1)
     upper_col_bound = min(len(grid[0]) - 1, col + 1)
 
-    total = 0
-    for r in range(lower_row_bound, upper_row_bound + 1):
-        for c in range(lower_col_bound, upper_col_bound + 1):
-            if r != row or c != col:  # Exclude center cell
-                total += grid[r][c]
+    total = sum(
+        grid[r][c]
+        for r in range(lower_row_bound, upper_row_bound + 1)
+        for c in range(lower_col_bound, upper_col_bound + 1)
+        if (r, c) != (row, col)  # Exclude center cell
+    )
 
     return total
 
 
-def solution(grid, part):
+def solution(grid: list[int], part: int) -> int:
     total_movable_rolls = 0
     removed_roll = True
-    while removed_roll == True:
+    while removed_roll:
         removed_roll = False
-        for i in range(len(grid)):
-            for j in range(len(grid[i])):
-                if grid[i][j] == 1 and num_rolls_surrounding(grid, i, j) < 4:
+        for i, row in enumerate(grid):
+            for j, cell in enumerate(row):
+                if cell == 1 and num_rolls_surrounding(grid, i, j) < 4:
                     total_movable_rolls += 1
                     if part == 2:
                         grid[i][j] = 0
