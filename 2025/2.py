@@ -1,4 +1,4 @@
-def fill_lps_memo_table(string, string_length, memo_table):
+def fill_lps_memo_table(string: str, string_length: int, memo_table: list[int]) -> None:
     prev_length = 0
     i = 1
     memo_table[0] = 0
@@ -16,17 +16,9 @@ def fill_lps_memo_table(string, string_length, memo_table):
                 i += 1
 
 
-def is_invalid(id, part=1):
-    id = str(id)
-
+def is_invalid(id: str, part=1) -> bool:
     if part == 1:
-        if len(id) % 2 == 1:
-            return False
-
-        for i in range(1, (int(len(id) / 2)) + 1):
-            if id[:i] == id[i:]:
-                return True
-        return False
+        return len(id) != 1 and id[: int(len(id) / 2)] == id[int(len(id) / 2) :]
     else:
         length = len(id)
         longest_prefix_suffix_memo = [0 for _ in range(length)]
@@ -40,15 +32,15 @@ def is_invalid(id, part=1):
         )
 
 
-def count_invalid_in_range(start, end, part=1):
+def count_invalid_in_range(start: int, end: int, part=1) -> int:
     count = 0
     for id in range(start, end + 1):
-        count += id if is_invalid(id, part) else 0
+        count += id if is_invalid(str(id), part) else 0
 
     return count
 
 
-def solution(ranges, part=1):
+def solution(ranges: list[str], part=1) -> int:
     count = 0
     for range in ranges:
         start, end = range.split("-")
