@@ -1,31 +1,24 @@
-def find_max_joltage(line, max_digits):
+def find_max_joltage(line: str, max_digits: int) -> int:
     stack = [line[0]]
-    drops_remaining = len(line) - max_digits
 
-    index = 0
+    for index, cur_digit_as_string in enumerate(list(line)):
+        if index == 0:
+            continue
 
-    for cur_digit_as_string in list(line)[1:]:
-        dropped = False
         while (
-            drops_remaining > 0
-            and len(stack) > 0
+            len(stack) > 0
             and int(cur_digit_as_string) > int(stack[-1])
             # There are enough digits after this one to make a long enough digit:
-            and len(stack) + (len(line) - (index + 1)) > max_digits
+            and len(stack) + (len(line) - (index)) > max_digits
         ):
             stack.pop()
-            dropped = True
-
-        if dropped:
-            drops_remaining - 1
 
         stack.append(cur_digit_as_string)
-        index += 1
 
     return int("".join(stack[0:max_digits]))
 
 
-def solution(lines, num_digits):
+def solution(lines: list[str], num_digits: int) -> int:
     total = 0
 
     for line in lines:
