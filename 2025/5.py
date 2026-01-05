@@ -5,12 +5,12 @@ class Range:
         self.low = low
         self.high = high
 
-    # Is the given number contained within this range?
-    def contains(self, num: int):
+    def contains(self, num: int) -> bool:
+        """Is the given number contained within this range?"""
         return num >= self.low and num <= self.high
 
-    # Does this range overlap with the other range?
-    def overlaps(self, other):
+    def overlaps(self, other: "Range") -> bool:
+        """Does this range overlap with the other range?"""
         return (
             self.contains(other.low)
             or self.contains(other.high)
@@ -19,8 +19,8 @@ class Range:
         )
 
 
-# Is the given number included in the list of fresh ranges?
-def is_fresh(ranges: list[Range], item_num: int):
+def is_fresh(ranges: list[Range], item_num: int) -> bool:
+    """Is the given number included in the list of fresh ranges?"""
     for range in ranges:
         if range.contains(item_num):
             return True
@@ -28,9 +28,9 @@ def is_fresh(ranges: list[Range], item_num: int):
     return False
 
 
-# Insert the given new range into the list of existing ranges, either by
-# merging it with an existing overlapping range, or by adding it at the end
-def insert_range_smart(ranges: list[Range], new_range: Range):
+def insert_range_smart(ranges: list[Range], new_range: Range) -> list[Range]:
+    """Inserts the given new range into the list of existing ranges, either by
+    merging it with an existing overlapping range, or by adding it at the end"""
     for range in ranges:
         if range.overlaps(new_range):
             new_range = Range(
@@ -43,7 +43,9 @@ def insert_range_smart(ranges: list[Range], new_range: Range):
     return ranges
 
 
-def solution(ranges: list[Range], item_nums: list[int] = [], is_part_2: bool = False):
+def solution(
+    ranges: list[Range], item_nums: list[int] = [], is_part_2: bool = False
+) -> int:
     if is_part_2:
         return sum([(range.high - range.low + 1) for range in ranges])
 
