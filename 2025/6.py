@@ -1,6 +1,7 @@
-import re
-from typing import Callable
+import operator
 from functools import reduce
+from typing import Callable
+
 import numpy as np
 
 
@@ -9,30 +10,20 @@ class Problem:
         self.nums = nums
         self.op = op
 
-    def add_num(self, new_num: int):
+    def add_num(self, new_num: int) -> None:
         self.nums.append(new_num)
 
-    def set_op(self, op: Callable[[int, int], int]):
+    def set_op(self, op: Callable[[int, int], int]) -> None:
         self.op = op
 
-    def solve(self):
+    def solve(self) -> int:
         return reduce(self.op, self.nums)
 
     def __str__(self):
         return f"Problem({self.nums},{self.op})"
 
 
-def set_string_op(op: str, problem: Problem):
-    if op == "+":
-        problem.set_op(lambda x, y: x + y)
-    elif op == "-":
-        problem.set_op(lambda x, y: x - y)
-    elif op == "*":
-        problem.set_op(lambda x, y: x * y)
-    elif op == "/":
-        problem.set_op(lambda x, y: x / y)
-    else:
-        raise ValueError("Unknown type")
+OPS = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
 
 
 def solution(problems: list[Problem]):
@@ -42,15 +33,13 @@ def solution(problems: list[Problem]):
 with open("2025/inputs/6.txt") as inpt:
     lines = inpt.readlines()
     problems: list[Problem] = []
-    # The list of potential expected ops at the start of a line
-    op_pattern = re.compile("\+|/|\*|-")
     for line in lines:
         tokens = [token.strip() for token in line.split(" ") if token.strip() != ""]
-        if op_pattern.match(line[0]) != None:
+        if tokens[0] in OPS:
             for op, problem in zip(tokens, problems):
-                set_string_op(op, problem)
+                problem.set_op(OPS[op])
         else:
-            for new_num, i in zip(tokens, range(len(tokens))):
+            for i, new_num in enumerate(tokens):
                 if i >= len(problems):
                     problems.append(Problem([int(new_num)]))
                 else:
@@ -61,26 +50,22 @@ with open("2025/inputs/6.txt") as inpt:
 
 inpt = np.genfromtxt("2025/inputs/6.txt", dtype="U1", delimiter=1)
 
-problem_numbers = []
+problems = []
 cur_problem_numbers = []
-for col in range(inpt.shape[1]):
-    column = list(inpt[:, col])
+for column in inpt.T:
+    column = list(column)
     if "".join(column).strip() == "":
-        problem_numbers.append(cur_problem_numbers)
+        problems.append(Problem(cur_problem_numbers))
         cur_problem_numbers = []
 
     new_num = "".join([digit for digit in column if digit in "1234567890"])
     if new_num != "":
         cur_problem_numbers.append(int(new_num))
 
-problem_numbers.append(cur_problem_numbers)
-
-problems = []
-for problem_numbers in problem_numbers:
-    problems.append(Problem(problem_numbers))
+problems.append(Problem(cur_problem_numbers))
 
 ops = [op_string.strip() for op_string in inpt[-1, :] if op_string.strip() != ""]
 for op, problem in zip(ops, problems):
-    set_string_op(op, problem)
+    problem.set_op(OPS[op])
 
 print("Solution for part 2: ", solution(problems))
