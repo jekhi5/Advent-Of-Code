@@ -9,6 +9,8 @@ def find_total_paths(
     found_targets: frozenset[int],
     target_indices: frozenset[int],
 ) -> tuple[int, int]:
+    """Count the total number of paths to from the given node to `out` as well as
+    all sub-paths that go through all target nodes"""
     out = len(nodes)
 
     if node_index in target_indices:
@@ -19,15 +21,14 @@ def find_total_paths(
     if memo_key in memo_table:
         return memo_table[memo_key]
 
-    this_node_total_paths = 0
-    this_node_total_paths_with_problem_nodes = 0
+    total_paths = 0
+    total_inclusive_paths = 0
     for connection in node_connections:
         if connection == out:
-            this_node_total_paths += 1
-            if found_targets == target_indices:
-                this_node_total_paths_with_problem_nodes += 1
+            total_paths += 1
+            total_inclusive_paths += 1 if found_targets == target_indices else 0
         else:
-            total_paths_from_here, total_problem_paths_from_here = find_total_paths(
+            total_paths_from_conn, total_inclusive_paths_from_conn = find_total_paths(
                 nodes[connection],
                 connection,
                 memo_table,
@@ -35,10 +36,10 @@ def find_total_paths(
                 found_targets,
                 target_indices,
             )
-            this_node_total_paths += total_paths_from_here
-            this_node_total_paths_with_problem_nodes += total_problem_paths_from_here
+            total_paths += total_paths_from_conn
+            total_inclusive_paths += total_inclusive_paths_from_conn
 
-    result = (this_node_total_paths, this_node_total_paths_with_problem_nodes)
+    result = (total_paths, total_inclusive_paths)
     memo_table[memo_key] = result
     return result
 
@@ -48,6 +49,7 @@ def solution(
 ) -> int:
     if target_nodes is None:
         target_nodes = []
+
     # string_nodes is a straight dictionary representation of the input, sorted alphabetically
     string_nodes = {
         node.split(":")[0]: [
@@ -77,8 +79,8 @@ def solution(
         for connections in string_nodes.values()
     ]
 
-    # The memo table contains information about how many paths each node (represented by the index)
-    # has to the "out" node as follows: (path_distance_total, path_distance_with_all_target_nodes)
+    # The memo table is keyed by the state of the node in any given path:
+    # (<node_index>, {<set_of_found_target_indices>}): (<total_overall_paths>, <total_paths_through_all_target_nodes>)
     memo_table = {}
 
     result = find_total_paths(
@@ -90,7 +92,7 @@ def solution(
         target_indices,
     )
 
-    return result[0 if target_indices is None else 1]
+    return result[0 if len(target_indices) == 0 else 1]
 
 
 with open("2025/inputs/11.txt") as inpt:
