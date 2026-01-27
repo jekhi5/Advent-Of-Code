@@ -1,3 +1,4 @@
 input.*
 Input-File.*
 *.txt
+**/**venv
